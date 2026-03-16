@@ -77,7 +77,14 @@ float NewtonRaphsonMaxBolt(float y, int N, float T, float (*func)(float, float, 
     uses the newton raphon method to solve for the velocity in the inverse CDF of the
     maxwell boltzman distribution, for N iterations using a uniform random 
     variable y [0,1), at a temperature T. An initial guess is optional.
+
+    NOTE if guess = 0 then this breaks for maxboltcdf so its set to the temp/ke conversion
+    velocity
     */
+    if(guess == 0)
+    {
+        guess = pow((2*k_B*T)/M, 0.5);
+    }
     float x_i = guess - func(guess, T, y)/deriv(guess,T);
     for(int i = 0; i < N-1; i++)
     {
@@ -92,13 +99,9 @@ int main()
     std::srand(time(0)); // seed uniform random num generator
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
 
-    std::vector<float> test{{RandomFloat(0,1), RandomFloat(0,1)}};
-    for(const auto& i : test)
-    {
-        std::cout<<i<<' ';
-    }
-    std::cout<<std::endl;
+    float root = NewtonRaphsonMaxBolt(0, 10, 0.001, MaxBoltCDF, MaxBoltPDF);
+    std::cout<<root<<std::endl;
 
-        
+    std::cout<<MaxBoltCDF(root,0.001)<<std::endl;
 
 }
