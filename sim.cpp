@@ -16,7 +16,6 @@ float PotentialSinSqr(float x, float t, float A, float k, float omega, float phi
     */
    return A*std::pow(std::sin((k*x) + (omega * t) + phi),2)
 }
-
 float ForceSinSqr(float x, float t, float A, float k, float omega, float phi)
 {
     /*
