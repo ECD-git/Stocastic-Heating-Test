@@ -56,16 +56,16 @@ float MaxBoltCDF(float v, float T)
     Returns the cdf value for the maxwell-boltzman distribution for a temp T and a vel v
     Assuming a const mass defined at the top of the program
     */
-    float a = pow((k_B*T)/M,0.5)
-    return std::erf(v/(pow(2,0.5)*a)) - pow(2/M_PI,0.5)*(v/a)*std::exp(-(pow(x,2)/(2*pow(a,2))));
+    float a = pow((k_B*T)/M,0.5);
+    return std::erf(v/(pow(2,0.5)*a)) - pow(2/M_PI,0.5)*(v/a)*std::exp(-(pow(v,2)/(2*pow(a,2))));
 }
 float MaxBoltPDF(float v, float T)
 {
     /*
     returns pdf of maxwell boltz dist -> derivative of cdf (hint hint newton raphson)
     */
-    float a = pow((k_B*T)/M,0.5)
-    return pow(2/M_PI, 0.5) * (pow(v,2)/pow(a,3)) * std::exp(-(pow(x,2)/(2*pow(a,2))));
+    float a = pow((k_B*T)/M,0.5);
+    return pow(2/M_PI, 0.5) * (pow(v,2)/pow(a,3)) * std::exp(-(pow(v,2)/(2*pow(a,2))));
 }
 
 // main
