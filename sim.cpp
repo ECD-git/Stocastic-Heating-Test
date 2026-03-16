@@ -7,9 +7,23 @@
 const float M = 1.00784*1.66*pow(10,-27); //[kg] //using atomic mass of H
 const float k_B = 1.380649*pow(10, -23); //boltzmann const
 
-// Random Functions
-float randomFloat(float min, float max)
+// variable spaces
+std::vector<float> LinSpace(float min, float max, int N)
 {
+    /*
+    Generates a vector of evenly space points between min and max of length N
+    Uses a lambda function to generate
+    */
+    // I made this with no prior knowledge of lambda functions haha we're so back
+    std::vector<float> result(N);
+    std::generate(result.begin(), result.end(), [n=0, &min, &max, &N] () mutable {++n; return min + (n-1)*((max-min)/(N-1));});
+    return result;
+}
+
+// Random Functions
+float RandomFloat(float min, float max)
+{
+    // generates a random float between a range min and max
     return min + static_cast <float> (std::rand()) / (static_cast <float> (RAND_MAX/(max-min)));
 }
 // Potential Functions
@@ -36,4 +50,13 @@ float ForceSinSqr(float x, float t, float A, float k, float omega, float phi)
 int main()
 {
     std::srand(time(0)); // seed uniform random num generator
+    // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
+
+    std::vector<float> test = LinSpace(1,5,5);
+    for(const auto& e : test)
+    {
+        std::cout<<e<<' ';
+    }
+    std::cout<<std::endl;
+
 }
