@@ -49,15 +49,17 @@ float ForceSinSqr(float x, float t, float A, float k, float omega, float phi)
    return k*A*std::sin(2*((k*x)+(omega*t)+phi));
 }
 
-// Numerical Methods for getting roots of maxwell-boltzman dist off set by random number
-float MaxBoltCDF(float v, float T)
+// Maxwell Boltzman shit
+float MaxBoltCDF(float v, float T, float offset = 0)
 {
     /*
     Returns the cdf value for the maxwell-boltzman distribution for a temp T and a vel v
-    Assuming a const mass defined at the top of the program
+    Assuming a const mass defined at the top of the program.
+    This can also be offset if needed (eg if tryna a velocity numerically using a numerical
+    method that finds roots)
     */
     float a = pow((k_B*T)/M,0.5);
-    return std::erf(v/(pow(2,0.5)*a)) - pow(2/M_PI,0.5)*(v/a)*std::exp(-(pow(v,2)/(2*pow(a,2))));
+    return -offset + std::erf(v/(pow(2,0.5)*a)) - pow(2/M_PI,0.5)*(v/a)*std::exp(-(pow(v,2)/(2*pow(a,2))));
 }
 float MaxBoltPDF(float v, float T)
 {
@@ -66,6 +68,22 @@ float MaxBoltPDF(float v, float T)
     */
     float a = pow((k_B*T)/M,0.5);
     return pow(2/M_PI, 0.5) * (pow(v,2)/pow(a,3)) * std::exp(-(pow(v,2)/(2*pow(a,2))));
+}
+
+//Numerical method
+float NewtonRaphsonMaxBolt(float y, int N, float T, float (*func)(float, float, float), float (*deriv)(float, float), float guess = 0)
+{
+    /*
+    uses the newton raphon method to solve for the velocity in the inverse CDF of the
+    maxwell boltzman distribution, for N iterations using a uniform random 
+    variable y [0,1), at a temperature T. An initial guess is optional.
+    */
+    float x_i = guess - func(guess, T, y)/deriv(guess,T);
+    for(int i = 0; i < N-1; i++)
+    {
+        x_i = x_i - func(x_i, T, y)/deriv(guess,T);
+    }
+    return x_i;
 }
 
 // main
