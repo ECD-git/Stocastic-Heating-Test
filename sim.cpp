@@ -16,3 +16,13 @@ float PotentialSinSqr(float x, float t, float A, float k, float omega, float phi
     */
    return A*std::pow(std::sin((k*x) + (omega * t) + phi),2)
 }
+
+float ForceSinSqr(float x, float t, float A, float k, float omega, float phi)
+{
+    /*
+    F = - dU/dx, so F = -kA sin(2[kx * omega t + phi])
+    takes in all variables and returns a float of the potential in joules
+    x expected in metres, time in s, omega in rad/s, A in joules, k in rad/m, phi in rad
+    */
+   return k*a*std::sin(2((k*x)+(omega*t)+phi));
+}
