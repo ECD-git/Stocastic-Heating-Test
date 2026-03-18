@@ -9,6 +9,13 @@
 const float M = 1.00784*1.66*pow(10,-27); //[kg] //using atomic mass of H
 const float k_B = 1.380649*pow(10, -23); //boltzmann const
 
+// Useful functions
+float KelToE(float kel)
+{
+    // converts E=k_BT
+    return k_B*kel;
+}
+
 // variable spaces
 std::vector<float> LinSpace(float min, float max, int N)
 {
@@ -50,44 +57,45 @@ float ForceSinSqr(float x, float t, float A, float k, float omega, float phi)
 }
 
 // Maxwell Boltzman shit
-float MaxBoltCDF(float v, float T, float offset = 0)
+float MaxBoltCDF(float v, float T, float U)
 {
     /*
-    Returns the cdf value for the maxwell-boltzman distribution for a temp T and a vel v
+    Returns the cdf value for the maxwell-boltzman distribution for a temp T and a vel v in potential U
     Assuming a const mass defined at the top of the program.
     This can also be offset if needed (eg if tryna a velocity numerically using a numerical
     method that finds roots)
     */
-    float a = pow((k_B*T)/M,0.5);
-    return -offset + std::erf(v/(pow(2,0.5)*a)) - pow(2/M_PI,0.5)*(v/a)*std::exp(-(pow(v,2)/(2*pow(a,2))));
+    float E = (0.5*M*pow(v,2))+U;
+    return std::erf( pow(E/(k_B*T),0.5) ) - (2/pow(M_PI,0.5))* pow(E/(k_B*T),0.5) * std::exp(-E/(k_B*T));
 }
-float MaxBoltPDF(float v, float T)
+float MaxBoltPDF(float v, float T, float U)
 {
     /*
     returns pdf of maxwell boltz dist -> derivative of cdf (hint hint newton raphson)
     */
-    float a = pow((k_B*T)/M,0.5);
-    return pow(2/M_PI, 0.5) * (pow(v,2)/pow(a,3)) * std::exp(-(pow(v,2)/(2*pow(a,2))));
+    float E = (0.5*M*pow(v,2))+U;
+    return pow(2/M_PI,0.5) * 2 * pow(M/(k_B*T),0.5) * (E/(k_B*T)) * std::exp(-E/(k_B*T));
 }
-//Numerical method
-float NewtonRaphsonMaxBolt(float y, int N, float T, float (*func)(float, float, float), float (*deriv)(float, float), float guess = 0)
-{
-    /*
-    uses the newton raphon method to solve for the velocity in the inverse CDF of the
-    maxwell boltzman distribution, for N iterations using a uniform random 
-    variable y [0,1), at a temperature T. An initial guess is optional.
 
-    NOTE if guess = 0 then this breaks for maxboltcdf so its set to the temp/ke conversion
-    velocity
-    */
+//Numerical methods
+float NewtonRaphsonMaxBolt(float y, float U, float T, int N, float (*func)(float, float, float), float (*deriv)(float, float, float), float guess = 0)
+{
+    
+    //uses the newton raphon method to solve for the velocity in the inverse CDF of the
+    //maxwell boltzman distribution, for N iterations using a uniform random 
+    //variable y [0,1), at a temperature T. An initial guess is optional.
+
+    //NOTE if guess = 0 then this breaks for maxboltcdf so its set to the temp/ke conversion
+    //velocity
+    
     if(guess == 0)
-    {
+    { // the deriv at 0 is undefined so if 0 is given then use KE = k_bT as guess
         guess = pow((2*k_B*T)/M, 0.5);
     }
-    float x_i = guess - func(guess, T, y)/deriv(guess,T);
+    float x_i = guess - (func(guess, T, U)-y)/deriv(guess, T, U);
     for(int i = 0; i < N-1; i++)
     {
-        x_i = x_i - func(x_i, T, y)/deriv(guess,T);
+        x_i = x_i - (func(x_i, T, U)-y)/deriv(guess,T,U);
     }
     return x_i;
 }
@@ -123,6 +131,6 @@ int main()
 {
     std::srand(time(0)); // seed uniform random num generator
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
-    
+    std::cout<<NewtonRaphsonMaxBolt(0.5, 0, 0.001, 5, MaxBoltCDF, MaxBoltPDF)<<std::endl;
 
 }
