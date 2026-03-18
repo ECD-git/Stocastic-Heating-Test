@@ -16,6 +16,24 @@ float KelToE(float kel)
     return k_B*kel;
 }
 
+// Random Functions
+float RandomFloat(float min, float max)
+{
+    // generates a random float between a range min and max
+    return min + static_cast <float> (std::rand()) / (static_cast <float> (RAND_MAX/(max-min)));
+}
+std::vector<float> RandomUnitVector()
+{
+    /*
+    Returns a 3vector with a magnitude of 1, pointing in a random dir
+    */
+    // use polar coords for most uniform spherical dist
+    float theta = RandomFloat(0, M_PI);
+    float phi = RandomFloat(0, 2*M_PI);
+    std::vector<float> i_hat{{std::sin(theta)*std::cos(phi),std::sin(theta)*std::sin(phi),std::cos(theta)}};
+    return i_hat;
+}
+
 // variable spaces
 std::vector<float> LinSpace(float min, float max, int N)
 {
@@ -28,12 +46,20 @@ std::vector<float> LinSpace(float min, float max, int N)
     std::generate(result.begin(), result.end(), [n=0, &min, &max, &N] () mutable {++n; return min + (n-1)*((max-min)/(N-1));});
     return result;
 }
-
-// Random Functions
-float RandomFloat(float min, float max)
+std::vector<float> RandLinSpace(int N, float min=0.0, float max=1.0)
 {
-    // generates a random float between a range min and max
-    return min + static_cast <float> (std::rand()) / (static_cast <float> (RAND_MAX/(max-min)));
+    /*
+    Generates a vector of N elements, uniformly randomly generated between min and max
+    */
+    std::vector<float> vec(N);
+    std::generate(vec.begin(), vec.end(), [&min, &max] () {return RandomFloat(min, max);});
+    return vec;
+}
+std::vector<std::vector<float>> RandUnitVecSpace(int N)
+{
+    std::vector<std::vector<float>> vec(N, std::vector<float>(3));
+    std::generate(vec.begin(), vec.end(), [] () {return RandomUnitVector();});
+    return vec;
 }
 
 // Potential Functions
@@ -101,17 +127,7 @@ float NewtonRaphsonMaxBolt(float y, float U, float T, int N, float (*func)(float
 }
 
 // Vector Processes
-std::vector<float> RandomUnitVector()
-{
-    /*
-    Returns a 3vector with a magnitude of 1, pointing in a random dir
-    */
-    // use polar coords for most uniform spherical dist
-    float theta = RandomFloat(0, M_PI);
-    float phi = RandomFloat(0, 2*M_PI);
-    std::vector<float> i_hat{{std::sin(theta)*std::cos(phi),std::sin(theta)*std::sin(phi),std::cos(theta)}};
-    return i_hat;
-}
+
 float VectorMagnitude(const std::vector<float>& vector)
 {
     float magnitude = 0;
@@ -131,6 +147,12 @@ int main()
 {
     std::srand(time(0)); // seed uniform random num generator
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
-    std::cout<<NewtonRaphsonMaxBolt(0.5, 0, 0.001, 5, MaxBoltCDF, MaxBoltPDF)<<std::endl;
-
+    for (auto& comp : RandUnitVecSpace(100))
+    {
+        for (auto& i : comp)
+        {
+            std::cout<<i<<' ';
+        }
+        std::cout<<std::endl;
+    }
 }
