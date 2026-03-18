@@ -69,7 +69,6 @@ float MaxBoltPDF(float v, float T)
     float a = pow((k_B*T)/M,0.5);
     return pow(2/M_PI, 0.5) * (pow(v,2)/pow(a,3)) * std::exp(-(pow(v,2)/(2*pow(a,2))));
 }
-
 //Numerical method
 float NewtonRaphsonMaxBolt(float y, int N, float T, float (*func)(float, float, float), float (*deriv)(float, float), float guess = 0)
 {
@@ -93,15 +92,37 @@ float NewtonRaphsonMaxBolt(float y, int N, float T, float (*func)(float, float, 
     return x_i;
 }
 
+// Vector Processes
+std::vector<float> RandomUnitVector()
+{
+    /*
+    Returns a 3vector with a magnitude of 1, pointing in a random dir
+    */
+    // use polar coords for most uniform spherical dist
+    float theta = RandomFloat(0, M_PI);
+    float phi = RandomFloat(0, 2*M_PI);
+    std::vector<float> i_hat{{std::sin(theta)*std::cos(phi),std::sin(theta)*std::sin(phi),std::cos(theta)}};
+    return i_hat;
+}
+float VectorMagnitude(const std::vector<float>& vector)
+{
+    float magnitude = 0;
+    for (const auto& i : vector)
+    {
+        magnitude += pow(i,2);
+    }
+    return pow(magnitude,0.5);
+}
+void ScaleVector(std::vector<float>& vec, float scale)
+{
+    std::transform(vec.begin(), vec.end(), vec.begin(), [&scale](float i){return i*scale;});
+}
+
 // main
 int main()
 {
     std::srand(time(0)); // seed uniform random num generator
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
-
-    float root = NewtonRaphsonMaxBolt(0, 10, 0.001, MaxBoltCDF, MaxBoltPDF);
-    std::cout<<root<<std::endl;
-
-    std::cout<<MaxBoltCDF(root,0.001)<<std::endl;
+    
 
 }
