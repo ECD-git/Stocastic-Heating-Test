@@ -142,17 +142,43 @@ void ScaleVector(std::vector<float>& vec, float scale)
     std::transform(vec.begin(), vec.end(), vec.begin(), [&scale](float i){return i*scale;});
 }
 
+//Tests
+void RandSphereDist(float N)
+{
+    // Pulls N random unit vectors and outputs them for plotting
+    std::ofstream result;
+    result.open("randsphere.dat");
+    for (auto& comp : RandUnitVecSpace(N))
+    {
+        for (auto& i : comp)
+        {
+            result<<i<<',';
+        }
+        result<<'\n';
+    }
+    result.close();
+}
+void MaxBoltHistTest(float N, float U, float T)
+{
+    // pulls N random velocities from our max bolt dist for plotting
+    std::ofstream result;
+    result.open("mbhisttest.dat");
+    std::vector<float> data(N);
+    std::generate(data.begin(), data.end(),  [&U, &T] () {return NewtonRaphsonMaxBolt(RandomFloat(0,1),U,T,5,MaxBoltCDF,MaxBoltPDF);});
+    result<<U<<'\n'<<T<<'\n';
+    for (float& i : data)
+    {
+        result<<i<<'\n';
+    }
+    result.close();
+}
+
 // main
 int main()
 {
     std::srand(time(0)); // seed uniform random num generator
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
-    for (auto& comp : RandUnitVecSpace(100))
-    {
-        for (auto& i : comp)
-        {
-            std::cout<<i<<' ';
-        }
-        std::cout<<std::endl;
-    }
+    // Tests
+    //RandSphereDist(1000);
+    MaxBoltHistTest(10000, 0, 0.005);
 }
