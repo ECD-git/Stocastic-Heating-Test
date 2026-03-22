@@ -168,7 +168,7 @@ void MaxBoltHistTest(float N, float U, float T)
     result<<U<<','<<T<<'\n';
     for(int i = 0; i < N; i++)
     {
-        result<<probs[i]<<','<<NewtonRaphsonMaxBolt(probs[i],U,T,5,MaxBoltCDF,MaxBoltPDF)<<'\n';
+        result<<probs[i]<<','<<NewtonRaphsonMaxBolt(probs[i],U,T,50,MaxBoltCDF,MaxBoltPDF)<<'\n';
     }
     result.close();
 }
