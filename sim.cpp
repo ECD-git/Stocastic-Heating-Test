@@ -163,12 +163,12 @@ void MaxBoltHistTest(float N, float U, float T)
     // pulls N random velocities from our max bolt dist for plotting
     std::ofstream result;
     result.open("mbhisttest.dat");
-    std::vector<float> data(N);
-    std::generate(data.begin(), data.end(),  [&U, &T] () {return NewtonRaphsonMaxBolt(RandomFloat(0,1),U,T,5,MaxBoltCDF,MaxBoltPDF);});
-    result<<U<<'\n'<<T<<'\n';
-    for (float& i : data)
+    std::vector<float> probs = RandLinSpace(N);
+
+    result<<U<<','<<T<<'\n';
+    for(int i = 0; i < N; i++)
     {
-        result<<i<<'\n';
+        result<<probs[i]<<','<<NewtonRaphsonMaxBolt(probs[i],U,T,5,MaxBoltCDF,MaxBoltPDF)<<'\n';
     }
     result.close();
 }
