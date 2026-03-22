@@ -28,8 +28,8 @@ std::vector<float> RandomUnitVector()
     Returns a 3vector with a magnitude of 1, pointing in a random dir
     */
     // use polar coords for most uniform spherical dist
-    float theta = RandomFloat(0, M_PI);
-    float phi = RandomFloat(0, 2*M_PI);
+    float theta = std::acos(1-2*RandomFloat(0,1)); // this must be distributed correctly to be slightly denser around equator
+    float phi = RandomFloat(0, 2*M_PI); // this just sweeps round equator so can be a linear random var
     std::vector<float> i_hat{{std::sin(theta)*std::cos(phi),std::sin(theta)*std::sin(phi),std::cos(theta)}};
     return i_hat;
 }
@@ -180,5 +180,7 @@ int main()
     // im seeding with local machine time here, which doesnt give complete randomness but should be sufficient for this
     // Tests
     //RandSphereDist(1000);
-    MaxBoltHistTest(10000, 0, 0.005);
+    MaxBoltHistTest(10000,0,0.005);
+    
+
 }
