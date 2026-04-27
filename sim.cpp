@@ -121,7 +121,7 @@ float NewtonRaphsonMaxBolt(float y, float U, float T, int N, float (*func)(float
     float x_i = guess - (func(guess, T, U)-y)/deriv(guess, T, U);
     for(int i = 0; i < N-1; i++)
     {
-        x_i = x_i - (func(x_i, T, U)-y)/deriv(guess,T,U);
+        x_i = x_i - (func(x_i, T, U)-y)/deriv(x_i,T,U);
     }
     return x_i;
 }
@@ -168,7 +168,7 @@ void MaxBoltHistTest(float N, float U, float T)
     result<<U<<','<<T<<'\n';
     for(int i = 0; i < N; i++)
     {
-        result<<probs[i]<<','<<NewtonRaphsonMaxBolt(probs[i],U,T,50,MaxBoltCDF,MaxBoltPDF)<<'\n';
+        result<<probs[i]<<','<<NewtonRaphsonMaxBolt(probs[i],U,T,20,MaxBoltCDF,MaxBoltPDF)<<'\n';
     }
     result.close();
 }
